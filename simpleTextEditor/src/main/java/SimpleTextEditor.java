@@ -1,7 +1,3 @@
-package io.github.ChubbaTheHutt.java-projects;
-
-
-
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.SwingUtilities;
@@ -27,7 +23,9 @@ import java.awt.event.ActionListener;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 /**
  *
  * @author Chubba
@@ -36,6 +34,8 @@ public class SimpleTextEditor {
         private JFrame frame;
         private JTextArea textArea;
         private final JFileChooser jfc = new JFileChooser();
+        private String currFilePath;
+        private boolean changesUnsaved;
         //instance vars for currFilePath? changesUnsaved? ...
 
         public SimpleTextEditor() {
@@ -70,7 +70,6 @@ public class SimpleTextEditor {
             
             frame.setSize(500,600);
             frame.setVisible(true);
-   
         }
 
     public JMenuBar menuBar(){
@@ -105,12 +104,15 @@ public class SimpleTextEditor {
         newFile.addActionListener(e -> {
             //Todo
             System.out.println("Are you sure you want to open a new file?");
+
+            //textArea.clear()
+            //changesUnsaved = true;
+            //...
         });
 
         saveAs.addActionListener(e -> {
             System.out.println("Save as...");
             saveFile(true);
-            //todo
         });
 
         //TODO add accelerators
@@ -123,21 +125,22 @@ public class SimpleTextEditor {
     }
 
     public JMenu helpMenu(){
-        JMenu help = new JMenu("help");
-        JMenuItem shortcuts = new JMenuItem("shortcuts");
+        JMenu help = new JMenu("Help");
+        JMenuItem shortcuts = new JMenuItem("Shortcuts");
 
         shortcuts.addActionListener(e -> {
             System.out.println("showing shortcuts page/popup");
         });
 
         help.add(shortcuts);
+        //todo: Modal/popup with shortcuts, could use JDialog
 
         return help;
     }
 
     public JMenu styleMenu(){
-        JMenu style = new JMenu("style");
-        JMenuItem font = new JMenuItem("font");
+        JMenu style = new JMenu("Style");
+        JMenuItem font = new JMenuItem("Font");
         
         font.addActionListener(e -> {
             System.out.println("changing font...");
@@ -149,17 +152,34 @@ public class SimpleTextEditor {
     }
 
     public void saveFile(boolean saveAs){
-        //save txt as txt or formatted file
-
         System.out.println("saving file...");
-        if(saveAs){
-            jfc.showSaveDialog(frame);
+        //save new instance of file 
+        if(saveAs){   
+            int result = jfc.showSaveDialog(frame);
+
+            if(result == JFileChooser.APPROVE_OPTION){
+                File file = jfc.getSelectedFile();
+                if(!file.getName().endsWith(".txt")) {
+                    file = new File(file.getAbsolutePath() + ".txt");
+                }
+
+                currFilePath = file.getAbsolutePath();
+
+                try {
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+                    textArea.write(bw);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            //Save as existing file//todo
+            System.out.println("file saved...");
         }
     };
 
     public void openFile(){
         //open txt files or formatted text files from pc
-        System.out.println("opening file...");
         FileNameExtensionFilter fnef = new FileNameExtensionFilter("TXT Files", "txt");
         jfc.setFileFilter(fnef);
         int result = jfc.showOpenDialog(frame);
