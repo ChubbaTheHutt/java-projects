@@ -34,7 +34,7 @@ public class SimpleTextEditor {
         private JFrame frame;
         private JTextArea textArea;
         private final JFileChooser jfc = new JFileChooser();
-        private String currFilePath;
+        private File currFile;
         private boolean changesUnsaved;
         //instance vars for currFilePath? changesUnsaved? ...
 
@@ -93,6 +93,13 @@ public class SimpleTextEditor {
             System.out.println(e);
             System.out.println("Saving file...");
             System.out.println(textArea.getText());
+
+            //saveFile(boolean saveAs?)
+            if(currFile == null){
+                saveFile(true);
+            } else {
+                saveFile(false);
+            }
             //todo
         });
 
@@ -104,7 +111,7 @@ public class SimpleTextEditor {
         newFile.addActionListener(e -> {
             //Todo
             System.out.println("Are you sure you want to open a new file?");
-
+            //modal yes/no;
             //textArea.clear()
             //changesUnsaved = true;
             //...
@@ -163,18 +170,26 @@ public class SimpleTextEditor {
                     file = new File(file.getAbsolutePath() + ".txt");
                 }
 
-                currFilePath = file.getAbsolutePath();
+                currFile = file;
 
                 try {
                     BufferedWriter bw = new BufferedWriter(new FileWriter(file));
                     textArea.write(bw);
+                    //todo: if 'file' exists in pwd, file(1).txt, file(2).txt, ...
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         } else {
-            //Save as existing file//todo
+            //quick save (ctrl+s)
             System.out.println("file saved...");
+            try {
+                BufferedWriter bw = new BufferedWriter(new FileWriter(currFile)); 
+                //assumes currFile exists
+                textArea.write(bw);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     };
 
@@ -191,11 +206,13 @@ public class SimpleTextEditor {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(fp));
                 textArea.setText("");
-                
+
                 String line;
                 while((line = br.readLine()) != null){
                     textArea.append(line + '\n');
                 }
+
+                currFile = file; //set current file path for quick save
             } catch (Exception e) {
                 e.printStackTrace();
             }
