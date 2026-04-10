@@ -2,24 +2,23 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.JOptionPane;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JButton;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+
 
 import java.awt.BorderLayout;
-import java.awt.HeadlessException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import java.io.File;
 import java.io.FileReader;
@@ -36,7 +35,6 @@ public class SimpleTextEditor {
         private final JFileChooser jfc = new JFileChooser();
         private File currFile;
         private boolean changesUnsaved;
-        //instance vars for currFilePath? changesUnsaved? ...
 
         public SimpleTextEditor() {
             initLookAndFeel();
@@ -63,7 +61,6 @@ public class SimpleTextEditor {
             textArea.setWrapStyleWord(true);
 
             JScrollPane textSP = new JScrollPane(textArea);
-
 
             frame.setJMenuBar(menuBar());
             frame.add(textSP, BorderLayout.CENTER);
@@ -105,22 +102,47 @@ public class SimpleTextEditor {
 
         open.addActionListener(e -> {
             System.out.println("Opening file...");
-            openFile();
+            //if unsaved changes, confirmation page
+            if(changesUnsaved == true){
+                int result = JOptionPane.showConfirmDialog(frame, "You have unsaved changes, do you still want to open a new file",
+                                                            "Unsaved Changes", JOptionPane.OK_CANCEL_OPTION);
+                if(result == JOptionPane.OK_OPTION){
+                    openFile();
+                } else {
+                    System.out.println("Open file canceled");
+                }
+            } else {
+                openFile();
+            }
         });
 
-        newFile.addActionListener(e -> {
-            //Todo
-            System.out.println("Are you sure you want to open a new file?");
-            //modal yes/no;
-            //textArea.clear()
-            //changesUnsaved = true;
-            //...
+        newFile.addActionListener(e ->   {
+            if(changesUnsaved == true){
+                int result = JOptionPane.showConfirmDialog(frame, "You have unsaved changes, do you still want to open a new file?",
+                                                            "Unsaved Changes", JOptionPane.OK_CANCEL_OPTION);
+                if(result == JOptionPane.OK_OPTION){
+                    textArea.setText("");
+                    changesUnsaved = true;
+                    currFile = null;
+                } else {
+                    System.out.println("Open new failed...");
+                }
+            } else {
+                textArea.setText("");
+                changesUnsaved = true;
+                currFile = null;
+            }
         });
-
+       
         saveAs.addActionListener(e -> {
             System.out.println("Save as...");
             saveFile(true);
         });
+
+        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+        open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
+        newFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+        saveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));       
 
         //TODO add accelerators
         file.add(save);
@@ -170,11 +192,12 @@ public class SimpleTextEditor {
                     file = new File(file.getAbsolutePath() + ".txt");
                 }
 
-                currFile = file;
+                currFile = file; //set current working file
 
                 try {
                     BufferedWriter bw = new BufferedWriter(new FileWriter(file));
                     textArea.write(bw);
+                    changesUnsaved = false;
                     //todo: if 'file' exists in pwd, file(1).txt, file(2).txt, ...
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -182,11 +205,12 @@ public class SimpleTextEditor {
             }
         } else {
             //quick save (ctrl+s)
-            System.out.println("file saved...");
             try {
                 BufferedWriter bw = new BufferedWriter(new FileWriter(currFile)); 
                 //assumes currFile exists
                 textArea.write(bw);
+
+                changesUnsaved = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -216,7 +240,6 @@ public class SimpleTextEditor {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     };
 
@@ -224,12 +247,10 @@ public class SimpleTextEditor {
         //todo create help page listing shortcuts and such
         JDialog helpPage = new JDialog(frame);
         helpPage.setTitle("Shortcuts & Help");
-
-        helpPage.show(true);
     };
 
     public void showHideHelpPage(){
-        
+        //if help page closed, open, if open, close. Check dialog visi. TODO     
     };
 
     public static void main(String[] args){
