@@ -2,13 +2,17 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JDialog;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.JOptionPane;
 import javax.swing.JFileChooser;
+
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -17,6 +21,7 @@ import javax.swing.KeyStroke;
 
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -34,7 +39,7 @@ public class SimpleTextEditor {
         private JTextArea textArea;
         private final JFileChooser jfc = new JFileChooser();
         private File currFile;
-        private boolean changesUnsaved;
+        private boolean changesUnsaved; //TODO, track changes unsaved after any change made to textArea
 
         public SimpleTextEditor() {
             initLookAndFeel();
@@ -158,7 +163,7 @@ public class SimpleTextEditor {
         JMenuItem shortcuts = new JMenuItem("Shortcuts");
 
         shortcuts.addActionListener(e -> {
-            System.out.println("showing shortcuts page/popup");
+            initHelpPage();
         });
 
         help.add(shortcuts);
@@ -247,10 +252,39 @@ public class SimpleTextEditor {
         //todo create help page listing shortcuts and such
         JDialog helpPage = new JDialog(frame);
         helpPage.setTitle("Shortcuts & Help");
+
+        JPanel panel = new JPanel((new GridLayout(2, 3)));
+        helpPage.setContentPane(panel);
+
+        String[] shortcuts = {
+            "Ctrl + s - Save",
+            "Ctrl + n - New File",
+            "Ctrl + o - Open File",
+            "Ctrl + shift + s - Save as",
+        };
+
+        for(String s : shortcuts){
+            panel.add(shortcutGridPanel(s));
+        }
+
+        helpPage.setSize(300,300);
+        helpPage.setVisible(true);
     };
 
+    public JPanel shortcutGridPanel(String s){
+        JPanel shortcutPanel = new JPanel(new BorderLayout());
+        JLabel shortcutLabel = new JLabel(s);
+
+        shortcutLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        shortcutLabel.setVerticalAlignment(SwingConstants.CENTER);
+        
+        shortcutPanel.add(shortcutLabel, BorderLayout.CENTER);
+
+        return shortcutPanel;
+    }
+
     public void showHideHelpPage(){
-        //if help page closed, open, if open, close. Check dialog visi. TODO     
+        //if help page closed, open, if open, close. Check dialog visi. TODO
     };
 
     public static void main(String[] args){
