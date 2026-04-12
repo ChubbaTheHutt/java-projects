@@ -40,6 +40,14 @@ public class SimpleTextEditor {
         private final JFileChooser jfc = new JFileChooser();
         private File currFile;
         private boolean changesUnsaved; //TODO, track changes unsaved after any change made to textArea
+        //solution: undoStack redoStack
+        //alt: DEQ, because we can pop from both sides (limited deq spots)
+        //private DEQUE undoDEQ;
+        //private DEQUE redoDEQ;
+        //custom DEQUE doubly linked list? Seems overboard
+        //array based, index access, static length, less overhead, placement requires array shifting, though
+        //Java ArrayDeque
+
 
         public SimpleTextEditor() {
             initLookAndFeel();
@@ -78,7 +86,7 @@ public class SimpleTextEditor {
         JMenuBar jmb = new JMenuBar();
 
         jmb.add(fileMenu());
-        jmb.add(styleMenu());
+        jmb.add(editMenu());
         jmb.add(helpMenu());
         
         return jmb;
@@ -172,17 +180,32 @@ public class SimpleTextEditor {
         return help;
     }
 
-    public JMenu styleMenu(){
-        JMenu style = new JMenu("Style");
+    public JMenu editMenu(){
+        JMenu edit = new JMenu("Edit");
         JMenuItem font = new JMenuItem("Font");
-        
+        JMenuItem undo = new JMenuItem("Redo");
+        JMenuItem redo = new JMenuItem("Undo");
+
         font.addActionListener(e -> {
             System.out.println("changing font...");
         });
         
-        style.add(font);
+        undo.addActionListener(e -> {
+            System.out.println("Undoing...");
+        });
 
-        return style;
+        redo.addActionListener(e -> {
+            System.out.println("Redoing...");
+        });
+
+        undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
+        redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
+
+        edit.add(font);
+        edit.add(undo);
+        edit.add(redo);
+
+        return edit;
     }
 
     public void saveFile(boolean saveAs){
@@ -282,10 +305,6 @@ public class SimpleTextEditor {
 
         return shortcutPanel;
     }
-
-    public void showHideHelpPage(){
-        //if help page closed, open, if open, close. Check dialog visi. TODO
-    };
 
     public static void main(String[] args){
         SwingUtilities.invokeLater(SimpleTextEditor::new);
