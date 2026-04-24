@@ -1,35 +1,31 @@
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.OceanTheme;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.SwingConstants;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JDialog;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.JOptionPane;
-import javax.swing.JFileChooser;
-
-import javax.swing.JLabel;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-
-
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
 /**
  *
  * @author Chubba
@@ -39,19 +35,14 @@ public class SimpleTextEditor {
         private JTextArea textArea;
         private final JFileChooser jfc = new JFileChooser();
         private File currFile;
-        private boolean changesUnsaved; //TODO, track changes unsaved after any change made to textArea
-        //solution: undoStack redoStack
-        //alt: DEQ, because we can pop from both sides (limited deq spots)
-        //private DEQUE undoDEQ;
-        //private DEQUE redoDEQ;
-        //custom DEQUE doubly linked list? Seems overboard
-        //array based, index access, static length, less overhead, placement requires array shifting, though
-        //Java ArrayDeque
+        private boolean changesUnsaved;
+        private ActionMemory actmem; //change history
 
 
         public SimpleTextEditor() {
             initLookAndFeel();
             initUI();
+            actmem = new ActionMemory();
         }
 
         private void initLookAndFeel() {

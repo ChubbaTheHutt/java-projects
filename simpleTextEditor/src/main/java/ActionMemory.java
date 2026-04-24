@@ -1,13 +1,10 @@
-
 import java.util.ArrayDeque;
-
-
 
 public class ActionMemory {
 
     private ArrayDeque undoArrayDeque;
     private ArrayDeque redoArrayDeque;
-    private int ACTION_MEMORY_SIZE = 3;
+    private static final int ACTION_MEMORY_SIZE = 3;
 
     public ActionMemory() {
         undoArrayDeque = new ArrayDeque(ACTION_MEMORY_SIZE);
@@ -27,6 +24,11 @@ public class ActionMemory {
         if(!redoArrayDeque.isEmpty()){
             redoArrayDeque = new ArrayDeque(ACTION_MEMORY_SIZE);
         }
+    }
+
+    public void clearMemory(){
+        undoArrayDeque = new ArrayDeque(ACTION_MEMORY_SIZE);
+        redoArrayDeque = new ArrayDeque(ACTION_MEMORY_SIZE);
     }
 
     public boolean isEmpty(){
