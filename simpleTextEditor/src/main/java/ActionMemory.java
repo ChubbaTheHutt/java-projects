@@ -7,16 +7,19 @@ public class ActionMemory {
     private static final int ACTION_MEMORY_SIZE = 3;
 
     public ActionMemory() {
-        undoArrayDeque = new ArrayDeque(ACTION_MEMORY_SIZE);
-        redoArrayDeque = new ArrayDeque(ACTION_MEMORY_SIZE);       
+        undoArrayDeque = new ArrayDeque<String>(ACTION_MEMORY_SIZE);
+        redoArrayDeque = new ArrayDeque<String>(ACTION_MEMORY_SIZE);       
     }
 
     public void redo(){
         //remove from redo add to undo
+        String temp = redoArrayDeque.poll().toString();
+        undoArrayDeque.addFirst(temp);
     }
 
     public void undo(){
-        //remove from undo add to redo
+        String temp = undoArrayDeque.poll().toString();
+        redoArrayDeque.addFirst(temp);
     }
 
     public void pushAction(String s){
@@ -27,8 +30,8 @@ public class ActionMemory {
     }
 
     public void clearMemory(){
-        undoArrayDeque = new ArrayDeque(ACTION_MEMORY_SIZE);
-        redoArrayDeque = new ArrayDeque(ACTION_MEMORY_SIZE);
+        undoArrayDeque = new ArrayDeque<String>(ACTION_MEMORY_SIZE);
+        redoArrayDeque = new ArrayDeque<String>(ACTION_MEMORY_SIZE);
     }
 
     public boolean isEmpty(){
